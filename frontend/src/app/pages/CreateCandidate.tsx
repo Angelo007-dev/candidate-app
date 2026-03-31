@@ -64,9 +64,7 @@ export default function Create() {
                 >
                     Créer
                 </button>
-
             </form>
-
         </div>
     );
 }

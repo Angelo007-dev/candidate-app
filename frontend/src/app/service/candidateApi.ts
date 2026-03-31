@@ -1,4 +1,4 @@
-import type { ICandidateRes, ICreateInput, IDataRes, IDataResponse } from "../model/model";
+import type { ICandidateRes, ICreateInput, IDataRes, IDataResponse, IStandardResponse } from "../model/model";
 import apiClient from "./candidateService";
 
 export const EEndpoint = {
@@ -53,14 +53,35 @@ export const api = {
             throw new Error(err);
         }
     },
-    /*dashboard: async () => {
+    deleteCandidate: async (_id: string) => {
         try {
-            const { data } = await apiClient.get<IDataRes<IDashboard>>(
-                EEndpoint.DASHBOARD,
+            const { data } = await apiClient.delete<IDataRes>(
+                `${EEndpoint.DELETE}/${_id}`,
             );
             return data;
         } catch (err: any) {
             throw new Error(err);
         }
-    },*/
+    },
+    viewCandidate: async (_id: string) => {
+        try {
+            const { data } = await apiClient.get<IStandardResponse<ICandidateRes>>(
+                `${EEndpoint.VIEW}/${_id}`,
+            );
+            return data;
+        } catch (err: any) {
+            throw new Error(err);
+        }
+    },
+    validateCandidate: async (_id: string) => {
+        try {
+            const { data } = await apiClient.patch<IDataRes>(
+                `${EEndpoint.VALIDATE}/${_id}`,
+            );
+            return data;
+        } catch (err: any) {
+            throw new Error(err);
+        }
+    },
+
 }

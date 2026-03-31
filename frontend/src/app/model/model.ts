@@ -14,6 +14,12 @@ export interface IDataResponse<T> {
     timestamp: string;
 }
 
+export interface IStandardResponse<T> {
+    success: boolean;
+    data: T;
+    timestamp: string;
+}
+
 export interface IDataRes {
     success: boolean;
     data: { message: string }
@@ -31,7 +37,7 @@ export interface ICandidateRes {
     name: string;
     email: string;
     phone: string;
-    status: string;
+    status: "validate" | "pending";
     createdAt: string;
     updatedAt: string;
     __v: number
@@ -40,5 +46,6 @@ export const CandidateSchema = z.object({
     name: z.string().nonempty("Le nom est obligatoire"),
     email: z.string().email("Email invalide"),
     phone: z.string().nonempty("le téléphone est obligatoire"),
+    status: z.enum(['pending', 'validate']).optional()
 });
 export type CandidateFormValues = z.infer<typeof CandidateSchema>;

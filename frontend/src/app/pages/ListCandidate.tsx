@@ -3,9 +3,11 @@ import type { QueryParamsOptions } from "../service/candidateApi";
 import CustomInput from "../components/input/CustomInput";
 import CustomSelect from "../components/input/CustomSelect";
 import type { TCandidatetatus } from "../constants";
-import { useList, useUpdate } from "../hooks/useApi";
-import { CheckIcon, EyeIcon, PencilIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { useDelete, useList, useUpdate } from "../hooks/useApi";
+import { CheckIcon, EyeIcon, PencilIcon, TrashIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import type { ICreateInput } from "../model/model";
+import { useNavigate } from "react-router-dom";
+import { LINKS } from "../constants/menu";
 
 
 const statusFr: Record<string, string> = {
@@ -19,8 +21,10 @@ interface IFilters {
     phone?: string;
 }
 export default function ListCandidate() {
-    const [editingId, setEditingId] = useState<string | null>(null);
+    const navigate = useNavigate();
+    const [selectedId, setSelectedId] = useState<string | null>(null);
     const [editValues, setEditValues] = useState<Partial<ICreateInput>>({});
+    const [modal, setModal] = useState(false);
 
     //page and filters
     const [page, setPage] = useState(1);
@@ -43,6 +47,7 @@ export default function ListCandidate() {
     const { data, isLoading, isError, isFetching } = useList(query);
 
     const { mutate: updateCandidate } = useUpdate();
+    const { mutate: deleteCandidate } = useDelete();
 
     if (isLoading) {
         return (
@@ -66,15 +71,15 @@ export default function ListCandidate() {
 
     //handler
     const handleView = (candidate: any) => {
-        alert(`Voir le candidat: ${candidate.name}`);
+        navigate(LINKS.VIEW_FUNC(candidate._id))
     };
     const handleEdit = (candidate: any) => {
-        setEditingId(candidate._id);
+        setSelectedId(candidate._id);
         setEditValues({ name: candidate.name, email: candidate.email, phone: candidate.phone })
     };
 
     const handleCancel = () => {
-        setEditingId(null);
+        setSelectedId(null);
         setEditValues({});
     };
 
@@ -86,12 +91,29 @@ export default function ListCandidate() {
         }
         );
 
-        setEditingId(null);
+        setSelectedId(null);
     };
-
     const handleChange = (field: string, value: string) => {
         setEditValues({ ...editValues, [field]: value })
-    }
+    };
+
+    const handleDelete = (id: string) => {
+        setSelectedId(id);
+        setModal(true);
+    };
+
+    const handleConfirmDelete = () => {
+        if (selectedId) {
+            deleteCandidate({ _id: selectedId });
+            setSelectedId(null);
+            setModal(false);
+        }
+    };
+
+    const handleCancelDelete = () => {
+        setSelectedId(null);
+        setModal(false);
+    };
 
     return (
         <div className='p-6' >
@@ -180,7 +202,7 @@ export default function ListCandidate() {
                                 <tbody>
                                     {
                                         data?.data.data.map((candidate: any) => {
-                                            const isEditing = editingId === candidate._id;
+                                            const isEditing = selectedId === candidate._id;
                                             return (
                                                 <tr key={candidate._id} className='hover:bg-gray-50' >
                                                     <>
@@ -255,9 +277,14 @@ export default function ListCandidate() {
                                                                 >
                                                                     <EyeIcon className='w-5 h-5' />
                                                                 </button>
+                                                                <button
+                                                                    className="text-red-500 hover:text-red-700"
+                                                                    onClick={() => handleDelete(candidate._id)}
+                                                                >
+                                                                    <TrashIcon className='w-5 h-5' />
+                                                                </button>
                                                             </>
                                                         )
-
                                                         }
                                                     </td>
                                                 </tr>
@@ -288,6 +315,29 @@ export default function ListCandidate() {
                     Suivant
                 </button>
             </div>
+            {modal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white p-6 rounded shadow-lg max-w-sm w-full">
+                        <h2 className="text-lg font-bold mb-4">Confirmer la suppression</h2>
+                        <p className="mb-6">Êtes-vous sûr de vouloir supprimer ce candidat ? Cette action est irréversible.</p>
+                        <div className="flex justify-end gap-4">
+                            <button
+                                onClick={handleCancelDelete}
+                                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                            >
+                                Annuler
+                            </button>
+                            <button
+                                onClick={handleConfirmDelete}
+                                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                            >
+                                Supprimer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
+
     )
 }
