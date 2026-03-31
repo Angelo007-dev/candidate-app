@@ -1,4 +1,4 @@
-import type { ICandidateRes, IDataResponse } from "../model/model";
+import type { ICandidateRes, ICreateInput, IDataRes, IDataResponse } from "../model/model";
 import apiClient from "./candidateService";
 
 export const EEndpoint = {
@@ -33,17 +33,26 @@ export const api = {
             throw new Error(err);
         }
     },
-    /*createCampaign: async (payload: ICreateInput) => {
+    createCandidate: async (payload: ICreateInput) => {
         try {
-            const { data } = await apiClient.post<IDataRes<ICampaign>>(
+            const { data } = await apiClient.post<IDataRes>(
                 EEndpoint.CREATE, payload
             );
             return data;
         } catch (err: any) {
             throw new Error(err);
         }
-    },*/
-
+    },
+    updateCandidate: async (_id: string, payload: Partial<ICreateInput>) => {
+        try {
+            const { data } = await apiClient.put<IDataRes>(
+                `${EEndpoint.UPDATE}/${_id}`, payload
+            );
+            return data;
+        } catch (err: any) {
+            throw new Error(err);
+        }
+    },
     /*dashboard: async () => {
         try {
             const { data } = await apiClient.get<IDataRes<IDashboard>>(

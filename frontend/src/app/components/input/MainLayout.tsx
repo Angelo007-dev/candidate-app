@@ -16,7 +16,7 @@ export default function MainLayout() {
                         <Link to="/list" className="text-blue-600 hover:underline">
                             List
                         </Link>
-                        <Link to="/new-campaign" className="text-blue-600 hover:underline">
+                        <Link to="/new-candidate" className="text-blue-600 hover:underline">
                             Créer
                         </Link>
                     </nav>

@@ -1,9 +1,12 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import type { QueryParamsOptions } from "../service/candidateApi";
 import CustomInput from "../components/input/CustomInput";
 import CustomSelect from "../components/input/CustomSelect";
 import type { TCandidatetatus } from "../constants";
-import { useList } from "../hooks/useApi";
+import { useList, useUpdate } from "../hooks/useApi";
+import { CheckIcon, EyeIcon, PencilIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import type { ICreateInput } from "../model/model";
+
 
 const statusFr: Record<string, string> = {
     pending: "En attente",
@@ -16,6 +19,10 @@ interface IFilters {
     phone?: string;
 }
 export default function ListCandidate() {
+    const [editingId, setEditingId] = useState<string | null>(null);
+    const [editValues, setEditValues] = useState<Partial<ICreateInput>>({});
+
+    //page and filters
     const [page, setPage] = useState(1);
     const [limit, setLimit] = useState(5);
     const [filters, setFilters] = useState<IFilters>({
@@ -24,14 +31,19 @@ export default function ListCandidate() {
         status: "",
         phone: "",
     });
-    const query: QueryParamsOptions = {
+
+    //hooks
+    const query: QueryParamsOptions = useMemo(() => ({
         page,
         limit,
         filters: filters,
         sort: { createdAt: -1 }
-    };
+    }), [page, limit, filters]);
 
     const { data, isLoading, isError, isFetching } = useList(query);
+
+    const { mutate: updateCandidate } = useUpdate();
+
     if (isLoading) {
         return (
             <div className="flex flex-col items-center justify-center h-[60vh]" >
@@ -50,7 +62,36 @@ export default function ListCandidate() {
         );
     }
     //pagination
-    const totalPages = data?.data?.meta?.totalPages || 1;
+    const totalPages = data?.data?.meta?.totalPage || 1;
+
+    //handler
+    const handleView = (candidate: any) => {
+        alert(`Voir le candidat: ${candidate.name}`);
+    };
+    const handleEdit = (candidate: any) => {
+        setEditingId(candidate._id);
+        setEditValues({ name: candidate.name, email: candidate.email, phone: candidate.phone })
+    };
+
+    const handleCancel = () => {
+        setEditingId(null);
+        setEditValues({});
+    };
+
+    const handleSave = (id: string) => {
+        //api
+        updateCandidate({
+            _id: id,
+            payload: editValues,
+        }
+        );
+
+        setEditingId(null);
+    };
+
+    const handleChange = (field: string, value: string) => {
+        setEditValues({ ...editValues, [field]: value })
+    }
 
     return (
         <div className='p-6' >
@@ -60,25 +101,36 @@ export default function ListCandidate() {
                         label='Nom'
                         placeholder='ex: Angelo'
                         value={filters.name}
-                        onChange={(e) => setFilters({ ...filters, name: e.target.value })
-                        }
+                        onChange={(e) => {
+                            setFilters({ ...filters, name: e.target.value });
+                            setPage(1);
+                        }}
                     />
                     < CustomInput
                         label='Email'
                         placeholder='ex: angelo@gmail.com'
                         value={filters.email}
-                        onChange={(e) => setFilters({ ...filters, email: e.target.value })}
+                        onChange={(e) => {
+                            setFilters({ ...filters, email: e.target.value })
+                            setPage(1);
+                        }}
                     />
                     < CustomInput
                         label='Numéro Téléphone'
                         placeholder='ex: 032 44 004 64'
                         value={filters.phone}
-                        onChange={(e) => setFilters({ ...filters, phone: e.target.value })}
+                        onChange={(e) => {
+                            setFilters({ ...filters, phone: e.target.value })
+                            setPage(1);
+                        }}
                     />
                     < CustomSelect
                         label='Status'
                         value={filters.status}
-                        onChange={(e) => setFilters({ ...filters, status: e.target.value as TCandidatetatus })}
+                        onChange={(e) => {
+                            setFilters({ ...filters, status: e.target.value as TCandidatetatus })
+                            setPage(1);
+                        }}
                     >
                         <option value="" > Tous </option>
                         < option value="pending" > En Attente </option>
@@ -122,29 +174,95 @@ export default function ListCandidate() {
                                         < th className='p-3 border-b' > Email </th>
                                         < th className='p-3 border-b' > Numéro Téléphone </th>
                                         < th className='p-3 border-b' > Status </th>
+                                        < th className='p-3 border-b' > Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {
-                                        data?.data.data.map((candidate: any) => (
-                                            <tr key={candidate._id} className='hover:bg-gray-50' >
-                                                <td className='p-3 border-b' > {candidate.name} </td>
-                                                < td className='p-3 border-b' > {candidate.email} </td>
-                                                < td className='p-3 border-b' > {candidate.phone} </td>
-                                                < td className='p-3 border-b uppercase' >
-                                                    <span
-                                                        className={`px-2 py-1 rounded-full text-white text-sm ${candidate.status === 'validate'
-                                                            ? 'bg-green-500'
-                                                            : candidate.status === 'pending'
-                                                                ? 'bg-yellow-500'
-                                                                : 'bg-red-500'
-                                                            }`}
-                                                    >
-                                                        {statusFr[candidate.status] || candidate.status}
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                        ))
+                                        data?.data.data.map((candidate: any) => {
+                                            const isEditing = editingId === candidate._id;
+                                            return (
+                                                <tr key={candidate._id} className='hover:bg-gray-50' >
+                                                    <>
+                                                    </>
+                                                    <td className='p-3 border-b' >
+                                                        {isEditing ? (
+                                                            <input
+                                                                value={editValues.name}
+                                                                onChange={(e) => handleChange('name', e.target.value)}
+                                                                className="border rounded px-2 py-1 w-full"
+                                                            />
+                                                        ) : (candidate.name)
+                                                        }
+                                                    </td>
+                                                    < td className='p-3 border-b' >
+                                                        {isEditing ? (
+                                                            <input
+                                                                value={editValues.email}
+                                                                onChange={(e) => handleChange('email', e.target.value)}
+                                                                className="border rounded px-2 py-1 w-full"
+                                                            />
+                                                        ) : (candidate.email)}
+                                                    </td>
+                                                    < td className='p-3 border-b' >
+                                                        {isEditing ? (
+                                                            <input
+                                                                value={editValues.phone}
+                                                                onChange={(e) => handleChange('phone', e.target.value)}
+                                                                className="border rounded px-2 py-1 w-full"
+                                                            />
+                                                        ) : (candidate.phone)}
+                                                    </td>
+                                                    < td className='p-3 border-b uppercase' >
+                                                        <span
+                                                            className={`px-2 py-1 rounded-full text-white text-sm ${candidate.status === 'validate'
+                                                                ? 'bg-green-500'
+                                                                : candidate.status === 'pending'
+                                                                    ? 'bg-yellow-500'
+                                                                    : 'bg-red-500'
+                                                                }`}
+                                                        >
+                                                            {statusFr[candidate.status] || candidate.status}
+                                                        </span>
+                                                    </td>
+                                                    <td className="p-3 border-b flex gap-6">
+                                                        {isEditing ? (
+                                                            <>
+                                                                <button
+                                                                    className="text-green-500 hover:text-green-700"
+                                                                    onClick={() => handleSave(candidate._id)}
+                                                                >
+                                                                    <CheckIcon className="w-5 h-5" />
+                                                                </button>
+                                                                <button
+                                                                    className="text-red-500 hover:text-red-700"
+                                                                    onClick={handleCancel}
+                                                                >
+                                                                    <XMarkIcon className="w-5 h-5" />
+                                                                </button>
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <button
+                                                                    className="text-blue-500 hover:text-blue-700"
+                                                                    onClick={() => handleEdit(candidate)}
+                                                                >
+                                                                    <PencilIcon className='w-5 h-5' />
+                                                                </button>
+                                                                <button
+                                                                    className="text-indigo-500 hover:text-indigo-700"
+                                                                    onClick={() => handleView(candidate)}
+                                                                >
+                                                                    <EyeIcon className='w-5 h-5' />
+                                                                </button>
+                                                            </>
+                                                        )
+
+                                                        }
+                                                    </td>
+                                                </tr>
+                                            )
+                                        })
                                     }
                                 </tbody>
                             </table>
