@@ -10,6 +10,8 @@ router.put('/:id', controller.update);
 
 router.delete('/:id', controller.remove);
 
-router.post('/:id/validate', controller.validate);
+router.patch('/:id/validate', controller.validateCandidate);
+
+router.get('/all/candidates', controller.getAll);
 
 export default router;

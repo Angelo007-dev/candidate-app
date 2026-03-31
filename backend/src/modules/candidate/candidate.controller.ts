@@ -2,6 +2,9 @@ import { Request, Response } from "express";
 import * as service from './candidate.service';
 import { createCandidateSchema } from "../../dto/CreateCandidate.dto";
 import { updateCandidateSchema } from "../../dto/UpdateCandidate.dto";
+import { QueryParamsDto } from "../../dto/QueryParamsDto";
+import { plainToInstance } from "class-transformer";
+import { validate } from "class-validator";
 
 export const create = async (req: Request, res: Response) => {
     try {
@@ -33,7 +36,24 @@ export const getOne = async (req: Request, res: Response) => {
     catch (err: any) {
         res.status(500).json({ error: err.errors || err.message });
     }
-}
+};
+
+export const getAll = async (req: Request, res: Response) => {
+    try {
+        const queryDto = plainToInstance(QueryParamsDto, req.query);
+        const errors = await validate(queryDto);
+        if (errors.length > 0) {
+            return res.status(400).json({ message: "Paramètre invalide", errors });
+        }
+
+        const candidates = await service.listCandidates(queryDto);
+
+        res.json(candidates);
+    }
+    catch (err: any) {
+        res.status(500).json({ message: 'Erreur lors de la récupération' });
+    }
+};
 
 export const update = async (req: Request, res: Response) => {
     try {
@@ -54,7 +74,7 @@ export const update = async (req: Request, res: Response) => {
     } catch (err: any) {
         res.status(400).json({ error: err.errors || err.message });
     }
-}
+};
 
 export const remove = async (req: Request, res: Response) => {
     try {
@@ -71,9 +91,9 @@ export const remove = async (req: Request, res: Response) => {
     } catch (err: any) {
         res.status(500).json({ error: err.message });
     }
-}
+};
 
-export const validate = async (req: Request, res: Response) => {
+export const validateCandidate = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
         if (typeof id !== 'string') {
@@ -89,4 +109,4 @@ export const validate = async (req: Request, res: Response) => {
     } catch (err: any) {
         res.status(500).json({ error: err.message });
     }
-}
+};

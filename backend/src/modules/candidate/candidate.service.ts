@@ -1,4 +1,5 @@
 import { CreateCandidateDto } from "../../dto/CreateCandidate.dto";
+import { QueryParamsDto } from "../../dto/QueryParamsDto";
 import { UpdateCandidateDto } from "../../dto/UpdateCandidate.dto";
 import candidateSchema from "./candidate.schema"
 
@@ -16,7 +17,7 @@ export const updateCandidate = async (id: string, data: UpdateCandidateDto) => {
 };
 
 export const deleteCandidate = async (id: string) => {
-    return await candidateSchema.findByIdAndUpdate(id, { deletedAt: new Date() }, { new: true });
+    return await candidateSchema.findByIdAndDelete(id, { deletedAt: new Date() });
 };
 
 export const validateCandidate = async (id: string) => {
@@ -24,4 +25,37 @@ export const validateCandidate = async (id: string) => {
     return await candidateSchema.findByIdAndUpdate(id, {
         status: "validate",
     }, { new: true });
+};
+
+export const listCandidates = async (dto: QueryParamsDto) => {
+    const { limit, filters, page, sort } = dto;
+
+    const skip = (page - 1) * limit;
+    const query: any = {
+        deleteAt: null //ignore les supprimé
+    };
+    if (filters.name) query.name = { $regex: filters.name, $options: "i" };
+    if (filters.email) query.email = { $regex: filters.email, $options: "i" };
+    if (filters.status) query.status = filters.status;
+
+    const [data, total] = await Promise.all([
+        candidateSchema.
+            find(query)
+            .sort(sort)
+            .skip(skip)
+            .limit(limit)
+            .exec(),
+        candidateSchema
+            .countDocuments(query)
+            .exec(),
+    ]);
+    return {
+        data,
+        meta: {
+            total,
+            page,
+            limit,
+            totalPage: Math.ceil(total / limit)
+        }
+    }
 };
