@@ -1,4 +1,4 @@
-import type { ICandidateRes, ICreateInput, IDataRes, IStandardResponse } from "../model/model";
+import type {  ICreateInput, IDataRes} from "../model/model";
 import { queryClient } from "../queryClients";
 import { api, EEndpoint, type QueryParamsOptions } from "../service/candidateApi";
 import { useMutation, useQuery } from "@tanstack/react-query"

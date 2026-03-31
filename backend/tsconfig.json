@@ -1,17 +1,17 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "NodeNext", // ou "CommonJS" selon ton setup
-    "moduleResolution": "NodeNext",
+    "module": "commonjs",
+    "moduleResolution": "node",
     "rootDir": "./src",
     "outDir": "./dist",
     "strict": true,
-    "esModuleInterop": true, // Résout l'erreur sur Express et JWT
-    "allowSyntheticDefaultImports": true, // Permet l'import par défaut
-    "useDefineForClassFields": false, // Résout l'erreur sur les DTO
-    "experimentalDecorators": true, // Résout l'erreur sur @IsNumber
-    "emitDecoratorMetadata": true, // Requis pour class-transformer
-    "skipLibCheck": true // Évite les erreurs venant des node_modules
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "useDefineForClassFields": false,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "skipLibCheck": true
   },
   "include": [
     "src/**/*"

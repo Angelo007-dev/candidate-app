@@ -13,9 +13,6 @@ export default function MainLayout() {
                     </Link>
 
                     <nav className="flex gap-6">
-                        <Link to="/list" className="text-blue-600 hover:underline">
-                            List
-                        </Link>
                         <Link to="/new-candidate" className="text-blue-600 hover:underline">
                             Créer
                         </Link>

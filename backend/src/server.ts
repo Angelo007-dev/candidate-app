@@ -7,14 +7,15 @@ import * as dotenv from "dotenv";
 
 dotenv.config();
 
-const PORT = process.env.APP_PORT || 3001;
+const PORT = process.env.PORT || 3002;
+const HOST = process.env.HOST || "0.0.0.0"
 const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/candidate-app"
 
 mongoose.connect(MONGO_URI)
     .then(() => {
         logger.info('MongoDB connecté')
-        app.listen(PORT, () => {
-            logger.info(`Serveur tourne sur http://localhost:${PORT}`);
+        app.listen(Number(PORT), HOST, () => {
+            logger.info(`Serveur tourne sur http://${HOST}:${PORT}`);
 
             const endpoints = listEndpoints(app);
 
