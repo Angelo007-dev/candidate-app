@@ -2,15 +2,15 @@ import { Router } from "express";
 import * as controller from "./candidate.controller"
 const router = Router();
 
-router.post("/", controller.create);
+router.post("/create", controller.create);
 
-router.get('/:id', controller.getOne);
+router.get('/view/:id', controller.getOne);
 
-router.put('/:id', controller.update);
+router.put('/update/:id', controller.update);
 
-router.delete('/:id', controller.remove);
+router.delete('/delete/:id', controller.remove);
 
-router.patch('/:id/validate', controller.validateCandidate);
+router.patch('/validate/:id', controller.validateCandidate);
 
 router.get('/all/candidates', controller.getAll);
 

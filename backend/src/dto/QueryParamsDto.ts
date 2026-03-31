@@ -5,9 +5,15 @@ export class CandidateFilter {
     @IsOptional()
     @IsString()
     name?: string;
+
     @IsOptional()
     @IsString()
     email?: string;
+
+    @IsOptional()
+    @IsString()
+    phone?: string;
+
     @IsOptional()
     @IsString()
     status?: string;
@@ -29,7 +35,7 @@ export class QueryParamsDto {
     @IsOptional()
     @ValidateNested()
     @Type(() => CandidateFilter)
-    filters: CandidateFilter = {};
+    filters: CandidateFilter = new CandidateFilter();
 
     @IsOptional()
     sort: any = { createdAt: -1 };

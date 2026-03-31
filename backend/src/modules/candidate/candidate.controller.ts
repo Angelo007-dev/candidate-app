@@ -40,17 +40,18 @@ export const getOne = async (req: Request, res: Response) => {
 
 export const getAll = async (req: Request, res: Response) => {
     try {
-        const queryDto = plainToInstance(QueryParamsDto, req.query);
+        const queryDto = plainToInstance(QueryParamsDto, req.query, { enableImplicitConversion: true });
         const errors = await validate(queryDto);
         if (errors.length > 0) {
             return res.status(400).json({ message: "Paramètre invalide", errors });
         }
 
         const candidates = await service.listCandidates(queryDto);
-
+        console.log("REQ QUERY RAW", req.query);
         res.json(candidates);
     }
     catch (err: any) {
+        console.error("REAL ERROR", err);
         res.status(500).json({ message: 'Erreur lors de la récupération' });
     }
 };
