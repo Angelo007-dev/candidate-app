@@ -55,7 +55,7 @@ export default function View() {
 
         <div className="max-w-xl mx-auto p-6">
 
-            <h1 className="text-2xl font-bold mb-6">Créer un candidat</h1>
+            <h1 className="text-2xl font-bold mb-6">Détails candidat</h1>
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 <CustomInput
@@ -85,6 +85,7 @@ export default function View() {
                 />
                 {candidate.data.status === "pending" ? (
                     <button
+                        aria-label="valider"
                         type="button"
                         onClick={handleValidate}
                         className="bg-green-600 text-white px-4 py-2 rounded"
@@ -93,6 +94,7 @@ export default function View() {
                     </button>
                 ) : (
                     <button
+                        aria-label="retour"
                         type="button"
                         onClick={() => navigate(LINKS.LIST)}
                         className="bg-gray-400 text-white px-4 py-2 rounded"

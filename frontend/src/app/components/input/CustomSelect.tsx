@@ -5,11 +5,14 @@ interface CustomSelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
     className?: string;
 }
 
-export default function CustomSelect({ label, className = '', children, ...props }: CustomSelectProps) {
+export default function CustomSelect({ label, className = '', children, id, ...props }: CustomSelectProps) {
+    const selectId = id || `custom-select-${Math.random().toString(36).substring(2, 9)}`
+
     return (
         <div className="flex flex-col flex-1 min-w-[150px]">
-            {label && <label className="mb-1 text-gray-600 text-sm">{label}</label>}
+            {label && <label htmlFor={selectId} className="mb-1 text-gray-600 text-sm">{label}</label>}
             <select
+                id={selectId}
                 {...props}
                 className={`
           border border-gray-300 

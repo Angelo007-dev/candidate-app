@@ -118,6 +118,7 @@ export default function ListCandidate() {
     return (
         <div className='p-6' >
             <div className='bg-white shadow-md rounded-lg p-6' >
+                <h1 className="text-xl font-bold mb-4">Liste des candidats</h1>
                 <div className='flex flex-wrap gap-4 mb-6' >
                     <CustomInput
                         label='Nom'
@@ -238,9 +239,9 @@ export default function ListCandidate() {
                                                     < td className='p-3 border-b uppercase' >
                                                         <span
                                                             className={`px-2 py-1 rounded-full text-white text-sm ${candidate.status === 'validate'
-                                                                ? 'bg-green-500'
+                                                                ? 'bg-green-700 text-white'
                                                                 : candidate.status === 'pending'
-                                                                    ? 'bg-yellow-500'
+                                                                    ? 'bg-yellow-700 text-white'
                                                                     : 'bg-red-500'
                                                                 }`}
                                                         >
@@ -251,12 +252,14 @@ export default function ListCandidate() {
                                                         {isEditing ? (
                                                             <>
                                                                 <button
+                                                                    aria-label="sauvegarder"
                                                                     className="text-green-500 hover:text-green-700"
                                                                     onClick={() => handleSave(candidate._id)}
                                                                 >
                                                                     <CheckIcon className="w-5 h-5" />
                                                                 </button>
                                                                 <button
+                                                                    aria-label="annuler"
                                                                     className="text-red-500 hover:text-red-700"
                                                                     onClick={handleCancel}
                                                                 >
@@ -266,18 +269,21 @@ export default function ListCandidate() {
                                                         ) : (
                                                             <>
                                                                 <button
+                                                                    aria-label="modifier"
                                                                     className="text-blue-500 hover:text-blue-700"
                                                                     onClick={() => handleEdit(candidate)}
                                                                 >
                                                                     <PencilIcon className='w-5 h-5' />
                                                                 </button>
                                                                 <button
+                                                                    aria-label="voir"
                                                                     className="text-indigo-500 hover:text-indigo-700"
                                                                     onClick={() => handleView(candidate)}
                                                                 >
                                                                     <EyeIcon className='w-5 h-5' />
                                                                 </button>
                                                                 <button
+                                                                    aria-label="supprimer"
                                                                     className="text-red-500 hover:text-red-700"
                                                                     onClick={() => handleDelete(candidate._id)}
                                                                 >

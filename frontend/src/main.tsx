@@ -8,7 +8,15 @@ import { SnackbarProvider } from 'notistack'
 import AppRouter from './app/routes/AppRouter.tsx'
 import { SnackbarUtilsConfig } from './app/utils/notify.ts'
 
-
+if (import.meta.env.DEV) {
+  import('@axe-core/react').then((axe) => {
+    import('react').then((React) => {
+      import('react-dom/client').then((ReactDOM) => {
+        axe.default(React, ReactDOM, 1000)
+      })
+    })
+  })
+}
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
