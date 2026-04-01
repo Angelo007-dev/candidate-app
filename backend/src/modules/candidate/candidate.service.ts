@@ -2,8 +2,7 @@ import { SortOrder } from "mongoose";
 import { CreateCandidateDto } from "../../dto/CreateCandidate.dto";
 import { QueryParamsDto } from "../../dto/QueryParamsDto";
 import { UpdateCandidateDto } from "../../dto/UpdateCandidate.dto";
-import candidateSchema from "./candidate.schema"
-import { regex } from "zod";
+import candidateSchema from "./candidate.schema";
 
 export const createCandidate = async (data: CreateCandidateDto) => {
     return await candidateSchema.create(data);
@@ -11,22 +10,24 @@ export const createCandidate = async (data: CreateCandidateDto) => {
 
 
 export const getCandidate = async (id: string) => {
-    return await candidateSchema.findById(id);
+    return await candidateSchema.findById(id).exec();
 };
 
 export const updateCandidate = async (id: string, data: UpdateCandidateDto) => {
-    return await candidateSchema.findByIdAndUpdate(id, data, { new: true });
+    return await candidateSchema.findByIdAndUpdate(id, data, { new: true }).exec();
 };
 
+
+//soft delete with find
 export const deleteCandidate = async (id: string) => {
-    return await candidateSchema.findByIdAndDelete(id, { deletedAt: new Date() });
+    return await candidateSchema.findByIdAndUpdate(id, { deletedAt: new Date() }, { new: true }).exec();
 };
 
 export const validateCandidate = async (id: string) => {
     await new Promise(res => setTimeout(res, 2000));
     return await candidateSchema.findByIdAndUpdate(id, {
         status: "validate",
-    }, { new: true });
+    }, { new: true }).exec();
 };
 
 export const listCandidates = async (dto: QueryParamsDto) => {
